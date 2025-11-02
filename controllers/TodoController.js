@@ -2,6 +2,7 @@ import db from '../models/index.js';
 import { Op } from 'sequelize';
 const Todo = db.Todo;
 const Category = db.Category;
+const User = db.User;
 
 export async function getAll(req, res) {
     try {
@@ -13,12 +14,22 @@ export async function getAll(req, res) {
         const order = getSortOrder(sort);
         const where = getWhereClause(categoryId, search);
 
+        if (req.user.role !== 'admin') {
+            where.user_id = req.user.id;
+        }
+
         const { count, rows } = await Todo.findAndCountAll({
-            include: {
-                model: Category,
-                as: 'category',
-                attributes: ['id', 'name']
-            },
+            include: [
+                {
+                    model: Category,
+                    as: 'category',
+                    attributes: ['name']
+                }, {
+                    model: User,
+                    as: 'user',
+                    attributes: ['username']
+                }
+            ],
             where,
             order,
             limit,
@@ -52,7 +63,7 @@ export async function getById(req, res) {
 export async function create(req, res) {
     const { title, category_id } = req.body;
     try {
-        const newTodo = await Todo.create({ title, category_id });
+        const newTodo = await Todo.create({ title, category_id, user_id: req.user.id });
         res.status(201).json(newTodo);
     } catch (error) {
         res.status(500).json({ error: 'Server Error' });

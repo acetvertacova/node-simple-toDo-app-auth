@@ -6,7 +6,11 @@ export default (sequelize) => {
       Todo.belongsTo(models.Category, {
         foreignKey: "category_id",
         as: 'category'
-      })
+      });
+      Todo.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: 'user'
+      });
     }
   }
   Todo.init({
@@ -31,7 +35,11 @@ export default (sequelize) => {
     due_date: {
       type: DataTypes.DATE,
       allowNull: true
-    }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
   }, {
     sequelize,
     modelName: 'Todo',

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import categoryRouter from "./routes/CategoryRoute.js";
 import todoRouter from "./routes/TodoRoute.js";
 import { swaggerUi, specs } from "./swagger/swagger.js";
+import userRouter from "./routes/UserRoute.js";
 
 const app = express();
 dotenv.config();
@@ -13,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/categories', categoryRouter);
 app.use('/api/todos', todoRouter);
-
+app.use('/api/auth', userRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(PORT, () => {

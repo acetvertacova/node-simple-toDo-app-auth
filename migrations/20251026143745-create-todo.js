@@ -25,6 +25,15 @@ export async function up(queryInterface, Sequelize) {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     },
+    user_id: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    },
     due_date: {
       type: Sequelize.DATE
     },
@@ -38,6 +47,7 @@ export async function up(queryInterface, Sequelize) {
     }
   });
 }
+
 export async function down(queryInterface, Sequelize) {
   await queryInterface.dropTable('Todos');
 }
