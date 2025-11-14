@@ -5,8 +5,10 @@ import todoRouter from "./routes/TodoRoute.js";
 import { swaggerUi, specs } from "./swagger/swagger.js";
 import userRouter from "./routes/UserRoute.js";
 import errorHandler from "./middleware/errorHandler.js";
+import requestLogger from "./middleware/requestLogger.js";
 
 const app = express();
+app.use(requestLogger);
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;

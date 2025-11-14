@@ -1,7 +1,9 @@
 import db from '../models/index.js';
 import { UserNotFoundError } from "../errors/404/UserNotFoundError.js";
 import { AuthenticationError } from "../errors/AuthenticationError.js";
+import { ValidationError } from "../errors/ValidationError.js";
 import { Op } from 'sequelize';
+import logger from '../utils/logger.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 const User = db.User;
@@ -17,8 +19,20 @@ export async function register(req, res) {
         }
     });
 
+    if (existingUser) {
+        throw new ValidationError("Validation failed", [
+            { field: "email", message: "Email already registered" },
+            { field: "username", message: "Username already taken" }
+        ]);
+    }
+
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
+
+    logger.info("New user registered", {
+        username, email, requestId: req.requestId
+    });
+
     res.status(201).json({ message: 'User registered successfully' });
 };
 
