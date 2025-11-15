@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import db from '../models/index.js';
 import { AuthenticationError } from '../errors/AuthenticationError.js';
-import { ToDoNotFoundError } from '../errors/404/ToDoNotFoundError.js';
+import { NotFoundError } from '../errors/NotFoundError.js';
 const Todo = db.Todo;
 
 const SECRET_KEY = process.env.JWT_SECRET || 'your_secret_key';
@@ -49,7 +49,7 @@ export async function isOwnerOrAdmin(req, res, next) {
         const todo = await Todo.findByPk(todoId);
 
         if (!todo) {
-            return next(new ToDoNotFoundError("Task not found", 404));
+            return next(new NotFoundError("Task not found", 404));
         }
 
         if (user.role === 'admin' || todo.user_id === user.id) {
