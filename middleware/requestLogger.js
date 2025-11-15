@@ -1,10 +1,9 @@
-// middlewares/requestLogger.js
 import logger from "../utils/logger.js";
-import { v4 as uuidv4 } from "uuid"; // npm install uuid
+import { v4 as uuidv4 } from "uuid";
 
 const requestLogger = (req, res, next) => {
-    const requestId = uuidv4(); // генерируем уникальный ID
-    req.requestId = requestId; // 
+    const requestId = uuidv4();
+    req.requestId = requestId;
     const start = Date.now();
 
     logger.info("Incoming request", {
@@ -15,14 +14,21 @@ const requestLogger = (req, res, next) => {
         userAgent: req.get("user-agent"),
     });
 
-    // res.on('finish') - событие, которое срабатывает когда ответ отправлен
-    // добавляем лог по завершению запроса
     res.on("finish", () => {
-        logger.info("Request completed", {
+        const responseTime = Date.now() - start;
+        const logData = {
             requestId,
+            method: req.method,
+            path: req.path,
             statusCode: res.statusCode,
-            responseTime: Date.now() - req.startTime,
-        });
+            responseTime,
+        };
+
+        if (res.statusCode >= 400) {
+            logger.error("Request failed", logData);
+        } else {
+            logger.info("Request completed", logData);
+        }
     });
 
     next();

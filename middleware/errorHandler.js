@@ -1,27 +1,26 @@
+import logger from "../utils/logger.js";
+
 const errorHandler = (err, req, res, next) => {
     const isDev = process.env.NODE_ENV === "development";
     const statusCode = err.statusCode || 500;
+    const logData = {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.path,
+        statusCode,
+        message: err.message,
+    };
 
-    // Базовая структура ответа
+    logger.error("Error:", logData);
     const response = {
         status: "error",
         message: err.message || "Unexpected error occurred",
     };
 
-    // Добавляем детали валидации, если они есть
     if (Array.isArray(err.errors) && err.errors.length > 0) {
         response.errors = err.errors;
     }
 
-    // В режиме разработки добавляем стек
-    // if (isDev) {
-    //     response.stack = err.stack;
-    // }
-
-    // Логирование
-    //console.error(`[${new Date().toISOString()}] ${err.name}: ${err.message}`);
-
-    // Отправляем ответ
     res.status(err.isOperational ? statusCode : 500).json(response);
 };
 
